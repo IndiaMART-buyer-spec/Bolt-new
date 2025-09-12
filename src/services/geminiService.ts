@@ -28,7 +28,7 @@ Schema (output format):
   "specifications": [
     {"spec_name": string, "spec_value": string}
   ],
-  "images": [base64 string],
+  "images": ["base64_image_1", "base64_image_2"],
   "price": string,
   "Description": string,
   "page_number": int
@@ -82,7 +82,7 @@ Output Format (JSON):
 {"spec_name": "Material", "spec_value": "Mono PERC, Bifacial 144 Cells"}
 ],
 "price": "₹12000",
-"images": ["base64_encoded_image_data"],
+"images": ["base64_image_1", "base64_image_2"],
 "Description": "A high-efficiency product made with Mono PERC, Bifacial 144 cells, providing 500W maximum power output. Ideal for various solar energy applications with excellent temperature resistance from -40°C to +85°C.",
 "page_number": 1
 },
@@ -93,7 +93,7 @@ Output Format (JSON):
 {"spec_name": "Not Present", "spec_value": "Not Present"}
 ],
 "price": "₹500",
-"images": ["unclear"],
+"images": [],
 "Description": "Not Present",
 "page_number": 3
 }
