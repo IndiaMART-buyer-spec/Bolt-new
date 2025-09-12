@@ -26,7 +26,11 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct): Product 
   const images = extracted.images && extracted.images.length > 0 
     ? extracted.images.map(base64 => {
         // Handle different image formats from PDF extraction
-        if (base64 && base64 !== 'unclear' && base64 !== 'Not Present' && base64.trim() !== '') {
+        if (base64 && 
+            base64 !== 'unclear' && 
+            base64 !== 'Not Present' && 
+            base64 !== 'extraction_failed' &&
+            base64.trim() !== '') {
           // If it's already a data URL, return as is
           if (base64.startsWith('data:')) {
             return base64;
@@ -36,18 +40,30 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct): Product 
             return base64;
           }
           // If it's base64 data, convert to data URL
-          return `data:image/jpeg;base64,${base64}`;
+          // Try to detect image type from base64 header
+          if (base64.startsWith('/9j/')) {
+            return `data:image/jpeg;base64,${base64}`;
+          } else if (base64.startsWith('iVBORw0KGgo')) {
+            return `data:image/png;base64,${base64}`;
+          } else if (base64.startsWith('R0lGODlh')) {
+            return `data:image/gif;base64,${base64}`;
+          } else {
+            // Default to jpeg if type cannot be determined
+            return `data:image/jpeg;base64,${base64}`;
+          }
         }
         return '';
-      }).filter(img => img !== '' && img !== 'unclear' && img !== 'Not Present') // Remove invalid images
+      }).filter(img => img !== '' && img !== 'unclear' && img !== 'Not Present' && img !== 'extraction_failed') // Remove invalid images
     : []; // Empty array if no valid images extracted from PDF
+
+  console.log(`Product ${extracted.product_name}: ${images.length} valid images processed`);
 
   return {
     id: extracted.product_id.toString(),
     name: extracted.product_name,
     price: price,
     currency: currency,
-    category: 'Extracted Product',
+    category: categoryName || 'Extracted Product',
     description: extracted.Description === 'Not Present' ? '' : extracted.Description,
     specifications: specifications,
     images: images,

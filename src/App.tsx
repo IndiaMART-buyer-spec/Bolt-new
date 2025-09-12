@@ -25,9 +25,6 @@ function App() {
   const [categoryName, setCategoryName] = useState('Industrial Products');
   const [extractionError, setExtractionError] = useState('');
 
-  // Real extracted data from PDF - this will be populated when PDF is processed
-  const [realExtractedData, setRealExtractedData] = useState<ExtractedProduct[]>([]);
-
   // Check if API key is configured
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
 
@@ -42,45 +39,6 @@ function App() {
     }
   }, []);
 
-  // Autosave functionality
-  React.useEffect(() => {
-    if (products.length > 0) {
-      localStorage.setItem('productManagement_products', JSON.stringify(products));
-      localStorage.setItem('productManagement_uploadedFile', JSON.stringify(uploadedFile));
-    }
-  }, [products, uploadedFile]);
-
-  // Load saved data on mount
-  React.useEffect(() => {
-    const savedProducts = localStorage.getItem('productManagement_products');
-    const savedExtractedProducts = localStorage.getItem('productManagement_extractedProducts');
-    const savedFile = localStorage.getItem('productManagement_uploadedFile');
-    const savedCategory = localStorage.getItem('productManagement_categoryName');
-    
-    if (savedProducts) {
-      setProducts(JSON.parse(savedProducts));
-    }
-    if (savedExtractedProducts) {
-      setExtractedProducts(JSON.parse(savedExtractedProducts));
-    }
-    if (savedFile) {
-      setUploadedFile(JSON.parse(savedFile));
-    }
-    if (savedCategory) {
-      setCategoryName(savedCategory);
-    }
-  }, []);
-
-  // Save extracted products to localStorage
-  React.useEffect(() => {
-    if (extractedProducts.length > 0) {
-      localStorage.setItem('productManagement_extractedProducts', JSON.stringify(extractedProducts));
-    }
-  }, [extractedProducts]);
-
-  React.useEffect(() => {
-    localStorage.setItem('productManagement_categoryName', categoryName);
-  }, [categoryName]);
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -128,26 +86,32 @@ function App() {
       return;
     }
 
+    // Clear previous data
+    setProducts([]);
+    setExtractedProducts([]);
+    setExtractionError('');
+    
     setIsUploading(true);
     setExtractionProgress('Initializing AI extraction...');
-    setExtractionError('');
 
     try {
       const geminiService = new GeminiService();
       
-      setExtractionProgress('Analyzing PDF content...');
+      setExtractionProgress('Analyzing PDF content and extracting images...');
       const extracted = await geminiService.extractProductsFromPDF(file, categoryName);
+      
+      console.log('Extracted data:', extracted); // Debug log
       
       setExtractionProgress('Converting product data...');
       const convertedProducts = extracted.map(convertExtractedToProduct);
       
       setExtractedProducts(extracted);
       setProducts(convertedProducts);
-      setExtractionProgress('Extraction completed successfully!');
+      setExtractionProgress(`Extraction completed! Found ${extracted.length} products with ${extracted.reduce((total, p) => total + (p.images?.length || 0), 0)} images.`);
       
       setTimeout(() => {
         setExtractionProgress('');
-      }, 2000);
+      }, 3000);
     } catch (error) {
       console.error('Extraction error:', error);
       setExtractionError(error instanceof Error ? error.message : 'Failed to extract products');
@@ -168,10 +132,6 @@ function App() {
     setIsFinishing(true);
     setTimeout(() => {
       setIsFinishing(false);
-      // Clear saved data after successful completion
-      localStorage.removeItem('productManagement_products');
-      localStorage.removeItem('productManagement_extractedProducts');
-      localStorage.removeItem('productManagement_uploadedFile');
       alert('Products saved successfully!');
     }, 2000);
   };
@@ -702,9 +662,9 @@ function App() {
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-900">
-                    {realExtractedData.length > 0 ? 'PDF Extracted Products' : 'Demo Products'} ({products.length})
+                    Extracted Products ({products.length})
                   </h3>
-                  {realExtractedData.length > 0 && (
+                  {extractedProducts.length > 0 && (
                     <button
                       onClick={handleDownloadJSON}
                       className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
