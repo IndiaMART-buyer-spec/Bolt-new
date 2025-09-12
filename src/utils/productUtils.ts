@@ -22,13 +22,17 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct): Product 
     price = '';
   }
 
-  // Use placeholder images if no images provided
+  // Only use images that are actually extracted from PDF
   const images = extracted.images && extracted.images.length > 0 
-    ? extracted.images 
-    : [
-        'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
-        'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=400'
-      ];
+    ? extracted.images.map(base64 => {
+        // If it's base64 data, convert to data URL
+        if (base64 && base64 !== 'unclear' && !base64.startsWith('http') && !base64.startsWith('data:')) {
+          return `data:image/jpeg;base64,${base64}`;
+        }
+        // If it's already a URL or unclear, return as is (or empty for unclear)
+        return base64 === 'unclear' ? '' : base64;
+      }).filter(img => img !== '') // Remove empty/unclear images
+    : []; // No placeholder images - show empty array if no images extracted
 
   return {
     id: extracted.product_id.toString(),

@@ -4,68 +4,64 @@ import { GeminiService } from './services/geminiService';
 import { Product, ExtractedProduct } from './types/product';
 import { convertExtractedToProduct, downloadProductsAsJSON } from './utils/productUtils';
 
-const mockProducts: Product[] = [
+// Sample extracted data for demonstration
+const sampleExtractedData: ExtractedProduct[] = [
   {
-    id: '1',
-    name: 'Heavy Duty Rubber Water Suction Hose',
-    price: '₹ 3500',
-    currency: 'INR',
-    category: 'Heavy Duty Hose',
-    description: 'Application: Fly Ash Rubber Hose, tank, truck, Bulker loading/unloading or in-plant transfer of dry bulk cement, sand, lime, slurry etc. suction or discharge of abrasive materials.',
-    specifications: {
-      'Size/Diameter': '12 inch',
-      'Length': '30 mtr',
-      'Product Type': 'Heavy Duty Suction Hose',
-      'Packaging Type': 'Roll Packaging',
-      'Country of Origin': 'Made in India',
-      'Material': 'Heavy Duty Rubber',
-      'Working Pressure': '150 PSI',
-      'Temperature Range': '-40°C to +80°C'
-    },
-    images: [
-      'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
-      'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=400',
-      'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=400'
-    ]
+    product_id: 1,
+    product_name: "Wireless Earbuds",
+    specifications: [
+      { spec_name: "Model", spec_value: "TWS-01" },
+      { spec_name: "Wireless Range", spec_value: "10m" },
+      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
+      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
+      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
+      { spec_name: "Earbud Battery", spec_value: "30mAh" },
+      { spec_name: "Charging Port", spec_value: "Type C" },
+      { spec_name: "Charging Time", spec_value: "1 hour" },
+      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
+    ],
+    price: "Not Present",
+    images: [],
+    Description: "Not Present",
+    page_number: 2
   },
   {
-    id: '2',
-    name: 'Industrial Grade Flexible Hose',
-    price: '₹ 2800',
-    currency: 'INR',
-    category: 'Flexible Hose',
-    description: 'High-quality flexible hose designed for industrial applications with superior durability and chemical resistance.',
-    specifications: {
-      'Size/Diameter': '8 inch',
-      'Length': '25 mtr',
-      'Product Type': 'Flexible Industrial Hose',
-      'Packaging Type': 'Coil Packaging',
-      'Country of Origin': 'Made in India',
-      'Material': 'Flexible Rubber',
-      'Working Pressure': '120 PSI'
-    },
-    images: [
-      'https://images.pexels.com/photos/1108572/pexels-photo-1108572.jpeg?auto=compress&cs=tinysrgb&w=400',
-      'https://images.pexels.com/photos/162553/keys-workshop-mechanic-tools-162553.jpeg?auto=compress&cs=tinysrgb&w=400'
-    ]
+    product_id: 2,
+    product_name: "Wireless Earbuds",
+    specifications: [
+      { spec_name: "Model", spec_value: "TWS-02" },
+      { spec_name: "Wireless Range", spec_value: "10m" },
+      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
+      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
+      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
+      { spec_name: "Earbud Battery", spec_value: "30mAh" },
+      { spec_name: "Charging Port", spec_value: "Type C" },
+      { spec_name: "Charging Time", spec_value: "≤ 30 mins" },
+      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
+    ],
+    price: "Not Present",
+    images: [],
+    Description: "Not Present",
+    page_number: 3
   },
   {
-    id: '3',
-    name: 'Chemical Resistant Suction Pipe',
-    price: '₹ 4200',
-    currency: 'INR',
-    category: 'Chemical Resistant',
-    description: 'Specially designed for handling chemicals and corrosive materials with maximum safety and reliability.',
-    specifications: {
-      'Size/Diameter': '6 inch',
-      'Length': '20 mtr',
-      'Product Type': 'Chemical Resistant Pipe',
-      'Packaging Type': 'Box Packaging',
-      'Country of Origin': 'Made in India'
-    },
-    images: [
-      'https://images.pexels.com/photos/1108101/pexels-photo-1108101.jpeg?auto=compress&cs=tinysrgb&w=400'
-    ]
+    product_id: 3,
+    product_name: "Wireless Earbuds",
+    specifications: [
+      { spec_name: "Model", spec_value: "TWS-07" },
+      { spec_name: "Wireless Range", spec_value: "10m" },
+      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
+      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
+      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
+      { spec_name: "Earbud Battery", spec_value: "30mAh" },
+      { spec_name: "Charging Port", spec_value: "Type C" },
+      { spec_name: "Charging Time", spec_value: "≤ 30 mins" },
+      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
+    ],
+    price: "Not Present",
+    images: [],
+    Description: "Not Present",
+    page_number: 4
   }
 ];
 
@@ -213,8 +209,10 @@ function App() {
     } catch (error) {
       console.error('Extraction error:', error);
       setExtractionError(error instanceof Error ? error.message : 'Failed to extract products');
-      // Fallback to mock data for demo purposes
-      setProducts(mockProducts);
+      // Fallback to sample extracted data for demo purposes
+      const convertedProducts = sampleExtractedData.map(convertExtractedToProduct);
+      setExtractedProducts(sampleExtractedData);
+      setProducts(convertedProducts);
     } finally {
       setIsUploading(false);
     }
@@ -299,14 +297,23 @@ function App() {
   const ProductCard = ({ product }: { product: Product }) => (
     <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
       <div className="p-6">
-        {/* Product Image Thumbnail */}
-        <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-          <img
-            src={product.images[0]}
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-        </div>
+        {/* Product Image Thumbnail - Only show if images exist */}
+        {product.images.length > 0 ? (
+          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+            <img
+              src={product.images[0]}
+              alt={product.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+            <div className="text-center text-gray-500">
+              <Image size={48} className="mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No images extracted</p>
+            </div>
+          </div>
+        )}
 
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
@@ -335,13 +342,19 @@ function App() {
           </div>
         </div>
         
-        <button
-          onClick={() => openImageGallery(product.id, product.images)}
-          className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
-        >
-          <Image size={18} />
-          View Images ({product.images.length})
-        </button>
+        {product.images.length > 0 ? (
+          <button
+            onClick={() => openImageGallery(product.id, product.images)}
+            className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+          >
+            <Image size={18} />
+            View Images ({product.images.length})
+          </button>
+        ) : (
+          <div className="w-full bg-gray-50 text-gray-500 font-medium py-3 px-4 rounded-lg text-center">
+            No images available
+          </div>
+        )}
       </div>
     </div>
   );
@@ -352,25 +365,45 @@ function App() {
         {/* Left: Product Images */}
         <div className="lg:w-1/3 p-6">
           <div className="space-y-4">
-            <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-red-500">
-              <img
-                src={product.images[0]}
-                alt={product.name}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {product.images.slice(0, 4).map((image, imgIndex) => (
-                <div key={imgIndex} className="aspect-square rounded-md overflow-hidden bg-gray-100 border">
+            {product.images.length > 0 ? (
+              <>
+                <div className="aspect-square rounded-lg overflow-hidden bg-gray-100 border-2 border-red-500">
                   <img
-                    src={image}
-                    alt={`${product.name} ${imgIndex + 1}`}
-                    className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                    onClick={() => openImageGallery(product.id, product.images)}
+                    src={product.images[0]}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
                   />
                 </div>
-              ))}
-            </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {product.images.slice(0, 4).map((image, imgIndex) => (
+                    <div key={imgIndex} className="aspect-square rounded-md overflow-hidden bg-gray-100 border">
+                      <img
+                        src={image}
+                        alt={`${product.name} ${imgIndex + 1}`}
+                        className="w-full h-full object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={() => openImageGallery(product.id, product.images)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="aspect-square rounded-lg bg-gray-100 border-2 border-gray-300 flex items-center justify-center">
+                  <div className="text-center text-gray-500">
+                    <Image size={48} className="mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">No images extracted</p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-4 gap-2">
+                  {[...Array(4)].map((_, imgIndex) => (
+                    <div key={imgIndex} className="aspect-square rounded-md bg-gray-100 border border-gray-200 flex items-center justify-center">
+                      <Image size={16} className="text-gray-400 opacity-50" />
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
             <button className="w-full bg-red-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-red-700 transition-colors">
               View PDF
             </button>
@@ -510,7 +543,13 @@ function App() {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex items-center">
                     <div className="flex-shrink-0 h-12 w-12">
-                      <img className="h-12 w-12 rounded-lg object-cover" src={product.images[0]} alt={product.name} />
+                      {product.images.length > 0 ? (
+                        <img className="h-12 w-12 rounded-lg object-cover" src={product.images[0]} alt={product.name} />
+                      ) : (
+                        <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center">
+                          <Image size={20} className="text-gray-400" />
+                        </div>
+                      )}
                     </div>
                     <div className="ml-4">
                       <div className="text-sm font-medium text-gray-900">{product.name}</div>
@@ -529,12 +568,16 @@ function App() {
                   {Object.keys(product.specifications).length} specs
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button
-                    onClick={() => openImageGallery(product.id, product.images)}
-                    className="text-blue-600 hover:text-blue-900"
-                  >
-                    {product.images.length} images
-                  </button>
+                  {product.images.length > 0 ? (
+                    <button
+                      onClick={() => openImageGallery(product.id, product.images)}
+                      className="text-blue-600 hover:text-blue-900"
+                    >
+                      {product.images.length} images
+                    </button>
+                  ) : (
+                    <span className="text-gray-400">No images</span>
+                  )}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
