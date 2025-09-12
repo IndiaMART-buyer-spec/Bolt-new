@@ -4,67 +4,6 @@ import { GeminiService } from './services/geminiService';
 import { Product, ExtractedProduct } from './types/product';
 import { convertExtractedToProduct, downloadProductsAsJSON } from './utils/productUtils';
 
-// Sample extracted data for demonstration
-const sampleExtractedData: ExtractedProduct[] = [
-  {
-    product_id: 1,
-    product_name: "Wireless Earbuds",
-    specifications: [
-      { spec_name: "Model", spec_value: "TWS-01" },
-      { spec_name: "Wireless Range", spec_value: "10m" },
-      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
-      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
-      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
-      { spec_name: "Earbud Battery", spec_value: "30mAh" },
-      { spec_name: "Charging Port", spec_value: "Type C" },
-      { spec_name: "Charging Time", spec_value: "1 hour" },
-      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
-    ],
-    price: "Not Present",
-    images: [],
-    Description: "Not Present",
-    page_number: 2
-  },
-  {
-    product_id: 2,
-    product_name: "Wireless Earbuds",
-    specifications: [
-      { spec_name: "Model", spec_value: "TWS-02" },
-      { spec_name: "Wireless Range", spec_value: "10m" },
-      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
-      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
-      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
-      { spec_name: "Earbud Battery", spec_value: "30mAh" },
-      { spec_name: "Charging Port", spec_value: "Type C" },
-      { spec_name: "Charging Time", spec_value: "≤ 30 mins" },
-      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
-    ],
-    price: "Not Present",
-    images: [],
-    Description: "Not Present",
-    page_number: 3
-  },
-  {
-    product_id: 3,
-    product_name: "Wireless Earbuds",
-    specifications: [
-      { spec_name: "Model", spec_value: "TWS-07" },
-      { spec_name: "Wireless Range", spec_value: "10m" },
-      { spec_name: "Play Time", spec_value: "7 to 8 hours" },
-      { spec_name: "Compatibility", spec_value: "Laptop, Mobile, Tablet, Desktop" },
-      { spec_name: "Charging Case Battery", spec_value: "200mAh" },
-      { spec_name: "Earbud Battery", spec_value: "30mAh" },
-      { spec_name: "Charging Port", spec_value: "Type C" },
-      { spec_name: "Charging Time", spec_value: "≤ 30 mins" },
-      { spec_name: "Touch Operation", spec_value: "On/Off, Song Change, Play/Pause, Call Received/Disconnect" }
-    ],
-    price: "Not Present",
-    images: [],
-    Description: "Not Present",
-    page_number: 4
-  }
-];
-
 const currencies = [
   { code: 'INR', symbol: '₹', name: 'Indian Rupee' },
   { code: 'USD', symbol: '$', name: 'US Dollar' },
@@ -85,6 +24,9 @@ function App() {
   const [dragActive, setDragActive] = useState(false);
   const [categoryName, setCategoryName] = useState('Industrial Products');
   const [extractionError, setExtractionError] = useState('');
+
+  // Real extracted data from PDF - this will be populated when PDF is processed
+  const [realExtractedData, setRealExtractedData] = useState<ExtractedProduct[]>([]);
 
   // Check if API key is configured
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
@@ -209,10 +151,6 @@ function App() {
     } catch (error) {
       console.error('Extraction error:', error);
       setExtractionError(error instanceof Error ? error.message : 'Failed to extract products');
-      // Fallback to sample extracted data for demo purposes
-      const convertedProducts = sampleExtractedData.map(convertExtractedToProduct);
-      setExtractedProducts(sampleExtractedData);
-      setProducts(convertedProducts);
     } finally {
       setIsUploading(false);
     }
@@ -677,7 +615,7 @@ function App() {
                   <Upload className="w-8 h-8 text-blue-600" />
                 </div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">AI-Powered Product Extraction</h2>
-                <p className="text-gray-600 mb-6">Upload your product catalog PDF and let AI extract structured product information</p>
+                <p className="text-gray-600 mb-6">Upload your product catalog PDF and let AI extract structured product information with images</p>
                 
                 {/* Drag and Drop Zone */}
                 {apiKeyConfigured ? (
@@ -764,15 +702,15 @@ function App() {
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-900">
-                    Extracted Products ({products.length})
+                    {realExtractedData.length > 0 ? 'PDF Extracted Products' : 'Demo Products'} ({products.length})
                   </h3>
-                  {extractedProducts.length > 0 && (
+                  {realExtractedData.length > 0 && (
                     <button
                       onClick={handleDownloadJSON}
                       className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                     >
                       <Download size={16} />
-                      Download JSON
+                      Download Extracted Data
                     </button>
                   )}
                 </div>
