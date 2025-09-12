@@ -25,14 +25,22 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct): Product 
   // Only use images that are actually extracted from PDF
   const images = extracted.images && extracted.images.length > 0 
     ? extracted.images.map(base64 => {
-        // If it's base64 data, convert to data URL
-        if (base64 && base64 !== 'unclear' && !base64.startsWith('http') && !base64.startsWith('data:')) {
+        // Handle different image formats from PDF extraction
+        if (base64 && base64 !== 'unclear' && base64 !== 'Not Present' && base64.trim() !== '') {
+          // If it's already a data URL, return as is
+          if (base64.startsWith('data:')) {
+            return base64;
+          }
+          // If it's a URL, return as is
+          if (base64.startsWith('http')) {
+            return base64;
+          }
+          // If it's base64 data, convert to data URL
           return `data:image/jpeg;base64,${base64}`;
         }
-        // If it's already a URL or unclear, return as is (or empty for unclear)
-        return base64 === 'unclear' ? '' : base64;
-      }).filter(img => img !== '') // Remove empty/unclear images
-    : []; // No placeholder images - show empty array if no images extracted
+        return '';
+      }).filter(img => img !== '' && img !== 'unclear' && img !== 'Not Present') // Remove invalid images
+    : []; // Empty array if no valid images extracted from PDF
 
   return {
     id: extracted.product_id.toString(),

@@ -19,7 +19,7 @@ export class GeminiService {
 
   private getExtractionPrompt(categoryName: string = "Industrial Products"): string {
     return `You are a structured data extraction system for "${categoryName}" product specifications.
-Extract clean, normalized product data from the provided content. 
+Extract clean, normalized product data from the provided PDF content including any images present.
 
 Schema (output format):
 {
@@ -28,11 +28,13 @@ Schema (output format):
   "specifications": [
     {"spec_name": string, "spec_value": string}
   ],
-  "images": ["base64_image_1", "base64_image_2"],
+  "images": ["base64_image_1", "base64_image_2"] or [],
   "price": string,
   "Description": string,
   "page_number": int
 }
+
+CRITICAL INSTRUCTIONS:
 -Use descriptive product names only (e.g., "Decorative Table Lamp") and do not include model numbers or internal codes (e.g., MK-AB-1147740)
 
 2. **Specifications Extraction**:
@@ -50,24 +52,32 @@ Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 -If price is missing or ambiguous, set "price":"Not Present"
 -Provide the price in Indian Rupees (₹)
 
-4. **Extract product description**:
+4. **Image Extraction**:
+-Extract ALL images associated with each product from the PDF
+-Convert images to base64 format
+-If no images are found for a product, set "images": []
+-Do NOT include placeholder or invented images
+-Only include actual images extracted from the PDF content
+
+5. **Extract product description**:
 -Extract product description provided in the PDF.
 -Summarize in max 250 characters
 -Focus on key differentiators and main features.
 -If the description is not provided in the PDF, set "Description": "Not Present". 
 -Do not create descriptions if not explicitly mentioned in the PDF
 
-5. **Data Quality**:
+6. **Data Quality**:
 -Standardize similar specification names (e.g., "Wi-Fi" and "Wireless LAN" → "Wi-Fi").
 -Correct spelling errors (e.g., "Batery Life" → "Battery Life").
 -Ensure consistent units for measurements.
 -Preserve special characters (≤, ≥, ±, °C, %) and do not escape them into Unicode.
 -Mark unclear values as "unclear"
 
-6. **Multiple Products**: 
+7. **Multiple Products**: 
 -Treat variants as separate products with unique integer IDs.
 -Focus on extracting comprehensive, meaningful specifications as name-value pairs that enable product comparison and proper categorization.
 -Extract only top 3 products from each PDF exactly in the order they appear in the PDF.
+
 Output Format (JSON):
 [
 {
@@ -82,7 +92,7 @@ Output Format (JSON):
 {"spec_name": "Material", "spec_value": "Mono PERC, Bifacial 144 Cells"}
 ],
 "price": "₹12000",
-"images": ["base64_image_1", "base64_image_2"],
+"images": ["base64_image_1", "base64_image_2"] or [],
 "Description": "A high-efficiency product made with Mono PERC, Bifacial 144 cells, providing 500W maximum power output. Ideal for various solar energy applications with excellent temperature resistance from -40°C to +85°C.",
 "page_number": 1
 },

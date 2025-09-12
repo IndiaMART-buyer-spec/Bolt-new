@@ -690,7 +690,7 @@ function App() {
                     <div>
                       <p className="font-medium">Extraction Error</p>
                       <p className="text-sm">{extractionError}</p>
-                      <p className="text-sm mt-1">Showing demo data instead.</p>
+                      <p className="text-sm mt-1">Please check your API key configuration and try again.</p>
                     </div>
                   </div>
                 </div>
