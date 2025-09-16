@@ -307,10 +307,10 @@ function App() {
         <div className="flex justify-between items-start mb-4">
           <div className="flex-1">
             <h3 className="text-xl font-bold text-gray-900 mb-1">{product.product_name}</h3>
-            <p className="text-sm text-blue-600 font-medium">Page {product.page_number}</p>
+            <p className="text-sm text-blue-600 font-medium">API Processed</p>
           </div>
           <span className="text-2xl font-bold text-green-600 ml-4">
-            {product.price}
+            {product.price && product.price !== "Not Present" ? product.price : "₹"}
           </span>
         </div>
         
