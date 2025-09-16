@@ -109,7 +109,7 @@ function App() {
       console.log('Extracted data:', extracted); // Debug log
       
       setExtractionProgress('Converting product data...');
-      const convertedProducts = extracted.map(convertExtractedToProduct);
+      const convertedProducts = extracted.map(product => convertExtractedToProduct(product, categoryName));
       
       setExtractedProducts(extracted);
       setProducts(convertedProducts);

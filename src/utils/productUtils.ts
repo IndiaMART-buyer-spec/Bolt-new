@@ -1,7 +1,7 @@
 import { ExtractedProduct, Product } from '../types/product';
 import { ApiProduct } from '../services/apiService';
 
-export const convertExtractedToProduct = (extracted: ExtractedProduct): Product => {
+export const convertExtractedToProduct = (extracted: ExtractedProduct, categoryName: string): Product => {
   // Convert specifications array to object
   const specifications: { [key: string]: string } = {};
   extracted.specifications.forEach(spec => {
