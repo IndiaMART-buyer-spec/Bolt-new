@@ -283,61 +283,82 @@ function App() {
     </div>
   );
 
-  const ApiProductCard = ({ product }: { product: ApiProduct }) => (
-    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
-      <div className="p-6">
-        {/* Product Image from API */}
-        {product.image && product.image !== "Not Present" ? (
-          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
-            <img
-              src={`data:image/png;base64,${product.image}`}
-              alt={product.product_name}
-              className="w-full h-full object-cover"
-            />
+  const ApiProductCard = ({ product }: { product: ApiProduct }) => {
+    // Convert API product to display format with images
+    const displayImages = product.image && product.image !== "Not Present" 
+      ? [`data:image/png;base64,${product.image}`] 
+      : [];
+
+    return (
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+        <div className="p-6">
+          {/* Product Image Thumbnail - Only show if images exist */}
+          {displayImages.length > 0 ? (
+            <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+              <img
+                src={displayImages[0]}
+                alt={product.product_name}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ) : (
+            <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+              <div className="text-center text-gray-500">
+                <Image size={48} className="mx-auto mb-2 opacity-50" />
+                <p className="text-sm">No images extracted</p>
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-between items-start mb-4">
+            <div className="flex-1">
+              <h3 className="text-xl font-bold text-gray-900 mb-1">{product.product_name}</h3>
+              <p className="text-sm text-blue-600 font-medium">Industrial Products</p>
+            </div>
+            <span className="text-2xl font-bold text-green-600 ml-4">
+              {product.price && product.price !== "Not Present" ? product.price : "₹"}
+            </span>
           </div>
-        ) : (
-          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
-            <div className="text-center text-gray-500">
-              <Image size={48} className="mx-auto mb-2 opacity-50" />
-              <p className="text-sm">No image available</p>
+          
+          <p className="text-gray-600 text-sm leading-relaxed mb-4">
+            {product.specifications.length > 0 ? 
+              product.specifications.map(spec => `${spec.spec_name}: ${spec.spec_value}`).join(', ').substring(0, 150) + '...' 
+              : 'No description available'
+            }
+          </p>
+          
+          <div className="bg-gray-50 rounded-lg p-4 mb-4">
+            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+              <FileText size={16} />
+              Specifications
+            </h4>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {product.specifications.map((spec, index) => (
+                <div key={index} className="flex justify-between text-sm">
+                  <span className="text-gray-600">{spec.spec_name}:</span>
+                  <span className="font-medium text-gray-900">{spec.spec_value}</span>
+                </div>
+              ))}
             </div>
           </div>
-        )}
-
-        <div className="flex justify-between items-start mb-4">
-          <div className="flex-1">
-            <h3 className="text-xl font-bold text-gray-900 mb-1">{product.product_name}</h3>
-            <p className="text-sm text-blue-600 font-medium">API Processed</p>
-          </div>
-          <span className="text-2xl font-bold text-green-600 ml-4">
-            {product.price && product.price !== "Not Present" ? product.price : "₹"}
-          </span>
-        </div>
-        
-        <div className="bg-gray-50 rounded-lg p-4 mb-4">
-          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-            <FileText size={16} />
-            Specifications
-          </h4>
-          <div className="space-y-2 max-h-32 overflow-y-auto">
-            {product.specifications.map((spec, index) => (
-              <div key={index} className="flex justify-between text-sm">
-                <span className="text-gray-600">{spec.spec_name}:</span>
-                <span className="font-medium text-gray-900">{spec.spec_value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        
-        <div className="text-center">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            <CheckCircle size={12} className="mr-1" />
-            API Processed
-          </span>
+          
+          {displayImages.length > 0 ? (
+            <button
+              onClick={() => openImageGallery(`api-${product.product_id}`, displayImages)}
+              className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-medium py-3 px-4 rounded-lg transition-colors duration-200 flex items-center justify-center gap-2"
+            >
+              <Image size={18} />
+              View Images ({displayImages.length})
+            </button>
+          ) : (
+            <div className="w-full bg-gray-50 text-gray-500 font-medium py-3 px-4 rounded-lg text-center">
+              No images available
+            </div>
+          )}
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const EditableProductCard = ({ product }: { product: Product }) => (
     <div className="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden hover:shadow-xl transition-shadow duration-300">
@@ -753,46 +774,29 @@ function App() {
             </div>
 
             {/* Products Grid */}
-            {apiProducts.length > 0 ? (
+            {(apiProducts.length > 0 || products.length > 0) && (
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-900">
-                    API Processed Products ({apiProducts.length})
+                    Extracted Products ({apiProducts.length > 0 ? apiProducts.length : products.length})
                   </h3>
                   <button
-                    onClick={() => downloadProductsAsJSON(apiProducts)}
+                    onClick={() => downloadProductsAsJSON(apiProducts.length > 0 ? apiProducts : extractedProducts)}
                     className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
                   >
                     <Download size={16} />
-                    Download API Results
+                    Download Extracted Data
                   </button>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {apiProducts.map((product) => (
-                    <ApiProductCard key={product.product_id} product={product} />
-                  ))}
-                </div>
-              </div>
-            ) : products.length > 0 && (
-              <div className="mb-8">
-                <div className="flex justify-between items-center mb-6">
-                  <h3 className="text-xl font-semibold text-gray-900">
-                    Extracted Products ({products.length})
-                  </h3>
-                  {extractedProducts.length > 0 && (
-                    <button
-                      onClick={handleDownloadJSON}
-                      className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
-                    >
-                      <Download size={16} />
-                      Download Extracted Data
-                    </button>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {products.map((product) => (
-                    <ProductCard key={product.id} product={product} />
-                  ))}
+                  {apiProducts.length > 0 
+                    ? apiProducts.map((product) => (
+                        <ApiProductCard key={product.product_id} product={product} />
+                      ))
+                    : products.map((product) => (
+                        <ProductCard key={product.id} product={product} />
+                      ))
+                  }
                 </div>
               </div>
             )}
