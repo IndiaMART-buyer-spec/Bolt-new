@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Upload, FileText, Image, ChevronRight, Save, Eye, X, Edit3, Check, Plus, File, Grid, List, CheckCircle, Download, AlertCircle } from 'lucide-react';
 import { GeminiService } from './services/geminiService';
+import { ApiService, ApiProduct } from './services/apiService';
 import { Product, ExtractedProduct } from './types/product';
 import { convertExtractedToProduct, downloadProductsAsJSON } from './utils/productUtils';
 
@@ -14,16 +15,19 @@ function App() {
   const [activeTab, setActiveTab] = useState(1);
   const [products, setProducts] = useState<Product[]>([]);
   const [extractedProducts, setExtractedProducts] = useState<ExtractedProduct[]>([]);
+  const [apiProducts, setApiProducts] = useState<ApiProduct[]>([]);
   const [viewMode, setViewMode] = useState<'card' | 'table'>('card');
   const [isUploading, setIsUploading] = useState(false);
   const [extractionProgress, setExtractionProgress] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [isFinishing, setIsFinishing] = useState(false);
   const [selectedImages, setSelectedImages] = useState<{ productId: string; images: string[] } | null>(null);
-  const [uploadedFile, setUploadedFile] = useState<{ name: string; size: number } | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [categoryName, setCategoryName] = useState('Industrial Products');
   const [extractionError, setExtractionError] = useState('');
+  const [isProcessingApi, setIsProcessingApi] = useState(false);
+  const [apiError, setApiError] = useState('');
 
   // Check if API key is configured
   const [apiKeyConfigured, setApiKeyConfigured] = useState(false);
@@ -76,7 +80,7 @@ function App() {
   };
 
   const processFile = (file: File) => {
-    setUploadedFile({ name: file.name, size: file.size });
+    setUploadedFile(file);
     extractProductsFromPDF(file);
   };
 
@@ -89,7 +93,9 @@ function App() {
     // Clear previous data
     setProducts([]);
     setExtractedProducts([]);
+    setApiProducts([]);
     setExtractionError('');
+    setApiError('');
     
     setIsUploading(true);
     setExtractionProgress('Initializing AI extraction...');
@@ -107,16 +113,36 @@ function App() {
       
       setExtractedProducts(extracted);
       setProducts(convertedProducts);
-      setExtractionProgress(`Extraction completed! Found ${extracted.length} products with ${extracted.reduce((total, p) => total + (p.images?.length || 0), 0)} images.`);
+      setExtractionProgress(`Gemini extraction completed! Found ${extracted.length} products. Now sending to Python API...`);
       
-      setTimeout(() => {
-        setExtractionProgress('');
-      }, 3000);
+      // Send to Python API
+      await sendToApi(file, extracted);
+      
     } catch (error) {
       console.error('Extraction error:', error);
       setExtractionError(error instanceof Error ? error.message : 'Failed to extract products');
     } finally {
       setIsUploading(false);
+    }
+  };
+
+  const sendToApi = async (file: File, extractedProducts: ExtractedProduct[]) => {
+    setIsProcessingApi(true);
+    setExtractionProgress('Sending data to Python API for image processing...');
+    
+    try {
+      const apiResponse = await ApiService.sendPdfAndProducts(file, extractedProducts);
+      setApiProducts(apiResponse.results);
+      setExtractionProgress(`API processing completed! Received ${apiResponse.results.length} products with processed images.`);
+      
+      setTimeout(() => {
+        setExtractionProgress('');
+      }, 3000);
+    } catch (error) {
+      console.error('API error:', error);
+      setApiError(error instanceof Error ? error.message : 'Failed to process with Python API');
+    } finally {
+      setIsProcessingApi(false);
     }
   };
 
@@ -253,6 +279,62 @@ function App() {
             No images available
           </div>
         )}
+      </div>
+    </div>
+  );
+
+  const ApiProductCard = ({ product }: { product: ApiProduct }) => (
+    <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl hover:scale-[1.02] transition-all duration-300">
+      <div className="p-6">
+        {/* Product Image from API */}
+        {product.image && product.image !== "Not Present" ? (
+          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 overflow-hidden">
+            <img
+              src={`data:image/png;base64,${product.image}`}
+              alt={product.product_name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <div className="w-full h-48 bg-gray-100 rounded-lg mb-4 flex items-center justify-center">
+            <div className="text-center text-gray-500">
+              <Image size={48} className="mx-auto mb-2 opacity-50" />
+              <p className="text-sm">No image available</p>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-between items-start mb-4">
+          <div className="flex-1">
+            <h3 className="text-xl font-bold text-gray-900 mb-1">{product.product_name}</h3>
+            <p className="text-sm text-blue-600 font-medium">Page {product.page_number}</p>
+          </div>
+          <span className="text-2xl font-bold text-green-600 ml-4">
+            {product.price}
+          </span>
+        </div>
+        
+        <div className="bg-gray-50 rounded-lg p-4 mb-4">
+          <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+            <FileText size={16} />
+            Specifications
+          </h4>
+          <div className="space-y-2 max-h-32 overflow-y-auto">
+            {product.specifications.map((spec, index) => (
+              <div key={index} className="flex justify-between text-sm">
+                <span className="text-gray-600">{spec.spec_name}:</span>
+                <span className="font-medium text-gray-900">{spec.spec_value}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="text-center">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            <CheckCircle size={12} className="mr-1" />
+            API Processed
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -634,10 +716,10 @@ function App() {
                 )}
               </div>
               
-              {(isUploading || extractionProgress) && (
+              {(isUploading || isProcessingApi || extractionProgress) && (
                 <div className="mt-6 text-center">
                   <div className="inline-flex items-center gap-3 text-blue-600">
-                    {isUploading && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>}
+                    {(isUploading || isProcessingApi) && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>}
                     <span>{extractionProgress || 'Processing PDF...'}</span>
                   </div>
                 </div>
@@ -655,10 +737,43 @@ function App() {
                   </div>
                 </div>
               )}
+
+              {apiError && (
+                <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">
+                  <div className="flex items-center gap-3 text-red-700">
+                    <AlertCircle size={20} />
+                    <div>
+                      <p className="font-medium">API Processing Error</p>
+                      <p className="text-sm">{apiError}</p>
+                      <p className="text-sm mt-1">Make sure your Python API is running on http://127.0.0.1:8000</p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Products Grid */}
-            {products.length > 0 && (
+            {apiProducts.length > 0 ? (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-6">
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    API Processed Products ({apiProducts.length})
+                  </h3>
+                  <button
+                    onClick={() => downloadProductsAsJSON(apiProducts)}
+                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg transition-colors"
+                  >
+                    <Download size={16} />
+                    Download API Results
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {apiProducts.map((product) => (
+                    <ApiProductCard key={product.product_id} product={product} />
+                  ))}
+                </div>
+              </div>
+            ) : products.length > 0 && (
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-6">
                   <h3 className="text-xl font-semibold text-gray-900">
@@ -740,7 +855,7 @@ function App() {
         )}
 
         {/* Sticky Save Button */}
-        {activeTab === 1 && products.length > 0 && (
+        {activeTab === 1 && (products.length > 0 || apiProducts.length > 0) && (
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40">
             <button
               onClick={handleSaveAndProceed}
@@ -764,7 +879,7 @@ function App() {
         )}
 
         {/* Sticky Save & Finish Button */}
-        {activeTab === 2 && products.length > 0 && (
+        {activeTab === 2 && (products.length > 0 || apiProducts.length > 0) && (
           <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40">
             <button
               onClick={handleSaveAndFinish}

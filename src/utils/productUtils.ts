@@ -1,4 +1,5 @@
 import { ExtractedProduct, Product } from '../types/product';
+import { ApiProduct } from '../services/apiService';
 
 export const convertExtractedToProduct = (extracted: ExtractedProduct): Product => {
   // Convert specifications array to object
@@ -71,11 +72,12 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct): Product 
   };
 };
 
-export const downloadProductsAsJSON = (products: ExtractedProduct[]) => {
+export const downloadProductsAsJSON = (products: ExtractedProduct[] | ApiProduct[]) => {
   const dataStr = JSON.stringify(products, null, 2);
   const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
   
-  const exportFileDefaultName = `extracted_products_${new Date().toISOString().split('T')[0]}.json`;
+  const isApiProducts = products.length > 0 && 'image' in products[0];
+  const exportFileDefaultName = `${isApiProducts ? 'api_processed' : 'extracted'}_products_${new Date().toISOString().split('T')[0]}.json`;
   
   const linkElement = document.createElement('a');
   linkElement.setAttribute('href', dataUri);
