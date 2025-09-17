@@ -313,19 +313,12 @@ function App() {
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
               <h3 className="text-xl font-bold text-gray-900 mb-1">{product.product_name}</h3>
-              <p className="text-sm text-blue-600 font-medium">Industrial Products</p>
+              <p className="text-sm text-blue-600 font-medium">Extracted Products</p>
             </div>
             <span className="text-2xl font-bold text-green-600 ml-4">
               {product.price && product.price !== "Not Present" ? product.price : "₹"}
             </span>
           </div>
-          
-          <p className="text-gray-600 text-sm leading-relaxed mb-4">
-            {product.specifications.length > 0 ? 
-              product.specifications.map(spec => `${spec.spec_name}: ${spec.spec_value}`).join(', ').substring(0, 150) + '...' 
-              : 'No description available'
-            }
-          </p>
           
           <div className="bg-gray-50 rounded-lg p-4 mb-4">
             <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
