@@ -164,13 +164,22 @@ CRITICAL REMINDERS:
       
       console.log('Raw AI response:', text);
       
-      // Clean the response to extract JSON
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      if (!jsonMatch) {
-        throw new Error('No valid JSON found in response');
+      // Try to extract JSON from markdown code blocks first
+      let jsonString = '';
+      const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+      
+      if (codeBlockMatch) {
+        jsonString = codeBlockMatch[1].trim();
+      } else {
+        // Fallback to finding JSON array in the response
+        const jsonMatch = text.match(/\[[\s\S]*\]/);
+        if (!jsonMatch) {
+          throw new Error('No valid JSON found in response');
+        }
+        jsonString = jsonMatch[0];
       }
 
-      const extractedProducts: ExtractedProduct[] = JSON.parse(jsonMatch[0]);
+      const extractedProducts: ExtractedProduct[] = JSON.parse(jsonString);
       
       // Log image extraction results
       extractedProducts.forEach((product, index) => {
