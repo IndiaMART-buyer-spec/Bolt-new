@@ -9,7 +9,7 @@ export class GeminiService {
   private model: any;
 
   constructor() {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyCJgOshJzaS05KTPh3zQHMQKM7rmSwbEoU') {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'Your Actual Gemini APi Key here') {
       throw new Error('Please configure your Gemini API key in the service file');
     }
     
