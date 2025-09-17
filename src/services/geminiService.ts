@@ -186,6 +186,12 @@ CRITICAL REMINDERS:
       return extractedProducts;
     } catch (error) {
       console.error('Error extracting products:', error);
+      
+      // Check for specific Gemini API overload error
+      if (error instanceof Error && error.message.includes('503') && error.message.includes('overloaded')) {
+        throw new Error('The AI service is currently overloaded. Please try again in a few minutes.');
+      }
+      
       throw new Error(`Failed to extract products: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
