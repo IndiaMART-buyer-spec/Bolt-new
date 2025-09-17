@@ -12,7 +12,7 @@ export interface ApiResponse {
 }
 
 export class ApiService {
-  private static readonly API_URL = 'https://17b798809fc5.ngrok-free.app/extract';
+  private static readonly API_URL = 'curl https://d4ef574a1aa7.ngrok-free.app/extract';
 
   static async sendPdfAndProducts(pdfFile: File, extractedProducts: any[]): Promise<ApiResponse> {
     try {
