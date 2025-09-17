@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ExtractedProduct } from '../types/product';
 
 // Replace this with your actual Gemini API key
-const GEMINI_API_KEY = 'AIzaSyBsr0641Ux5o5XpT4rVfN7GviNh8aXrva8';
+const GEMINI_API_KEY = 'AIzaSyCJgOshJzaS05KTPh3zQHMQKM7rmSwbEoU';
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
