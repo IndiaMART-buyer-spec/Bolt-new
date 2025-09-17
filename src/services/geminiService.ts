@@ -2,14 +2,14 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ExtractedProduct } from '../types/product';
 
 // Replace this with your actual Gemini API key
-const GEMINI_API_KEY = 'AIzaSyA-gpzf0nPK7gVmbfSd-etM94AyZq9J2RQ';
+const GEMINI_API_KEY = 'AIzaSyCJgOshJzaS05KTPh3zQHMQKM7rmSwbEoU';
 
 export class GeminiService {
   private genAI: GoogleGenerativeAI;
   private model: any;
 
   constructor() {
-    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_ACTUAL_GEMINI_API_KEY_HERE') {
+    if (!GEMINI_API_KEY || GEMINI_API_KEY === 'AIzaSyCJgOshJzaS05KTPh3zQHMQKM7rmSwbEoU') {
       throw new Error('Please configure your Gemini API key in the service file');
     }
     
