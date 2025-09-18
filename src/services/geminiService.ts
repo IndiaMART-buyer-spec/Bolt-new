@@ -179,7 +179,26 @@ CRITICAL REMINDERS:
         jsonString = jsonMatch[0];
       }
 
-      const extractedProducts: ExtractedProduct[] = JSON.parse(jsonString);
+  let extractedProducts: ExtractedProduct[] = [];
+
+try {
+  extractedProducts = JSON.parse(jsonString);
+} catch (parseError) {
+  console.error("Invalid JSON received, trying to repair...", parseError);
+
+  // Fallback: Ask Gemini to fix JSON
+  const fixPrompt = `The following JSON is invalid. Fix it and return only valid JSON:\n\n${jsonString}`;
+  const fixResult = await this.model.generateContent([fixPrompt]);
+  const fixedText = fixResult.response.text();
+  const fixedJsonMatch = fixedText.match(/\[[\s\S]*\]/);
+  
+  if (!fixedJsonMatch) {
+    throw new Error("Could not repair JSON");
+  }
+
+  extractedProducts = JSON.parse(fixedJsonMatch[0]);
+}
+
       
       // Log image extraction results
       extractedProducts.forEach((product, index) => {
