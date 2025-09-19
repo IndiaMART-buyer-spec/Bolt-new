@@ -61,6 +61,7 @@ CRITICAL INSTRUCTIONS:
 Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 -Use normalized, consistent spec_name values (e.g., "Weight", "Dimensions", "Capacity", "Material", "Brand", "Model", "Power", "Voltage", "Pressure", "Temperature Range").
 -Do not include price information in the specifications.
+-Ensure only one specification value per specification for each product.
 
 3. **Price Extraction**:
 -Extract product price if available.
@@ -136,7 +137,8 @@ CRITICAL REMINDERS:
 
 - Ensure that each product variant is considered as a unique product entry.
 - Extract only top 3 products from each PDF exactly in the order they appear in the PDF.
-- Include "page_number" to specify the page number each product appears on in the pdf
+- Include "page_number" to specify the page number each product appears on in the pdf.
+- Ensure only one specification value per specification for each product.
 - Return only valid JSON, no additional text or explanations.`;
   }
 
