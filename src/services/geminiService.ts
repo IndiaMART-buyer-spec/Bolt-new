@@ -64,10 +64,12 @@ Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 
 **SPECIFICATION RULES**:
 - Each spec_name must be unique within a product
-- If multiple values exist for same specification, combine them (e.g., "Color: Red/Blue" not separate entries)
+- If multiple values/options exist for same specification, choose ONLY the first/primary value
+- DO NOT include multiple options or ranges (e.g., NOT "200, 300, 400" but only "200")
+- DO NOT include parenthetical explanations (e.g., NOT "200 (8\")" but only "200")
+- Extract single, specific values only
 - Never duplicate specification names within the same product
 - Maximum one entry per specification type per product
-CRITICAL: Ensure only one specification value per specification for each product - no duplicates allowed.
 
 3. **Price Extraction**:
 -Extract product price if available.
@@ -86,10 +88,11 @@ CRITICAL: Ensure only one specification value per specification for each product
 
 5. **Extract product description**:
 -Extract product description provided in the PDF.
--Summarize in max 250 characters
--Focus on key differentiators and main features.
--If the description is not provided in the PDF, set "Description": "Not Present". 
--Do not create descriptions if not explicitly mentioned in the PDF
+-ONLY extract description if it is explicitly written in the PDF
+-Do NOT create, generate, or summarize descriptions
+-If no description is found in the PDF, set "Description": "Not Present"
+-Do NOT use specifications to create descriptions
+-Description must be actual text from the PDF, not AI-generated content
 
 6. **Data Quality**:
 -Standardize similar specification names (e.g., "Wi-Fi" and "Wireless LAN" → "Wi-Fi").
@@ -135,6 +138,9 @@ Output Format (JSON):
 ]
 
 CRITICAL REMINDERS:
+- NEVER create descriptions - only extract if explicitly present in PDF
+- Each specification must have exactly ONE value, not multiple options
+- Choose the primary/first value when multiple options exist
 - Images array must contain actual base64 data URLs, not empty arrays or placeholders
 - Extract ALL images from the PDF, even if they seem unrelated to specific products
 - Use complete data URL format: "data:image/[jpeg|png|gif];base64,[actual_base64_data]"

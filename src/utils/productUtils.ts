@@ -64,8 +64,8 @@ export const convertExtractedToProduct = (extracted: ExtractedProduct, categoryN
     name: extracted.product_name,
     price: price,
     currency: currency,
-    category: categoryName || 'Extracted Product',
-    description: extracted.Description === 'Not Present' ? '' : extracted.Description,
+    category: 'Extracted Products',
+    description: extracted.Description === 'Not Present' || !extracted.Description ? '' : extracted.Description,
     specifications: specifications,
     images: images,
     page_number: extracted.page_number
