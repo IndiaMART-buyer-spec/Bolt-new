@@ -64,9 +64,20 @@ Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 
 **SPECIFICATION RULES**:
 - Each spec_name must be unique within a product
+- Preserve special characters (≤, ≥, ±, °C, %) in their original form
+- If no specifications are available for a product, both the spec_name and spec_value should be set   to "Not Present"
+ Example- {{"spec_name": "Not Present", "spec_value": "Not Present"}}
+- Use normalized, consistent spec_name values (e.g., "Weight", "Dimensions", "Capacity", "Material", "Brand", "Model", "Power", "Voltage", "Pressure", "Temperature Range").
+-Do not include price information in the specifications.
+-Standardize spec_value with units and clean text:(e.g., "6kg", "500x200x150mm", "15 bar", "220V", "-10°C to 50°C").
+-Examples:
+{{"spec_name": "Weight", "spec_value": "2kg"}}
+{{"spec_name": "Dimensions", "spec_value": "500x300x200mm"}}
+{{"spec_name": "Capacity", "spec_value": "6kg"}}
+{{"spec_name": "Material", "spec_value": "Steel"}}
+{{"spec_name": "Operating Pressure", "spec_value": "15 bar"}}
 - If multiple values/options exist for same specification, choose ONLY the first/primary value
-- DO NOT include multiple options or ranges (e.g., NOT "200, 300, 400" but only "200")
-- DO NOT include parenthetical explanations (e.g., NOT "200 (8\")" but only "200")
+- DO NOT include multiple options (e.g., NOT "200, 300, 400" but only "200")
 - Extract single, specific values only
 - Never duplicate specification names within the same product
 - Maximum one entry per specification type per product
