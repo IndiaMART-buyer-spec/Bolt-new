@@ -64,7 +64,10 @@ Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 
 **SPECIFICATION RULES**:
 - Each spec_name must be unique within a product
+- If multiple values/options exist for same specification, choose ONLY the first/primary value
 - DO NOT include multiple options or ranges (e.g., NOT "200, 300, 400" but only "200")
+- DO NOT include parenthetical explanations (e.g., NOT "200 (8\")" but only "200")
+- Extract single, specific values only
 - Never duplicate specification names within the same product
 - Maximum one entry per specification type per product
 
