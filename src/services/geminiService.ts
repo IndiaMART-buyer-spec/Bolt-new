@@ -61,7 +61,13 @@ CRITICAL INSTRUCTIONS:
 Example- {"spec_name": "Not Present", "spec_value": "Not Present"}
 -Use normalized, consistent spec_name values (e.g., "Weight", "Dimensions", "Capacity", "Material", "Brand", "Model", "Power", "Voltage", "Pressure", "Temperature Range").
 -Do not include price information in the specifications.
--Ensure only one specification value per specification for each product.
+
+**SPECIFICATION RULES**:
+- Each spec_name must be unique within a product
+- If multiple values exist for same specification, combine them (e.g., "Color: Red/Blue" not separate entries)
+- Never duplicate specification names within the same product
+- Maximum one entry per specification type per product
+CRITICAL: Ensure only one specification value per specification for each product - no duplicates allowed.
 
 3. **Price Extraction**:
 -Extract product price if available.
